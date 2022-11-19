@@ -1,0 +1,16 @@
+---
+k3s_user: "root"
+k3s_group: "root"
+k3s_extra_groups: []
+k3s_version: "1.23.4+k3s1"
+k3s_base_directory: "/opt/k3s"
+k3s_directory: "{{ k3s_base_directory }}/{{ k3s_version }}"
+k3s_master: "https://localhost:6443"
+k3s_binary_name: "k3s"
+k3s_binary_path: "{{ k3s_directory }}/{{ k3s_binary_name }}"
+k3s_release_url: "https://github.com/k3s-io/k3s/releases/download/v{{ k3s_version|urlencode }}/{{ k3s_binary_name }}"
+k3s_master_init_command: "{{ k3s_binary_path }} server --cluster-init --data-dir {{ k3s_base_directory }}/data{{ k3s_command_opts }}"
+k3s_master_command: "{{ k3s_binary_path }} server --server {{ k3s_master }} --data-dir {{ k3s_base_directory }}/data{{ k3s_command_opts }}"
+k3s_node_command: "{{ k3s_binary_path }} agent --server {{ k3s_master }} --data-dir {{ k3s_base_directory }}/data{{ k3s_command_opts }}"
+k3s_command_opts: ""
+k3s_token: ""

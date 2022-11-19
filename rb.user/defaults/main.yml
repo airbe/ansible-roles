@@ -1,0 +1,6 @@
+---
+
+users: []
+users_sudo_without_password: no
+users_auto_update_authorized_keys_enable: no
+users_auto_update_authorized_keys: []

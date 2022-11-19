@@ -1,0 +1,16 @@
+[Service]
+ExecStart={{ app_exec_start }}
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier={{ app_name }}
+User={{ app_user }}
+Group={{ app_group }}
+KillSignal={{ app_kill_signal }}
+{% for item in app_environment_vars %}
+Environment={{ item }}
+{% endfor %}
+WorkingDirectory={{ app_basedir }}/{{ app_name }}/current
+
+[Install]
+WantedBy=multi-user.target

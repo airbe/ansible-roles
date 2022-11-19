@@ -1,0 +1,9 @@
+[Unit]
+Description=send metrics every minute
+Wants=metrics-{{ pushgateway_custom_job_name }}.timer
+
+[Service]
+ExecStart=/usr/bin/metrics-{{ pushgateway_custom_job_name }}.sh
+
+[Install]
+WantedBy=metrics-{{ pushgateway_custom_job_name }}.target

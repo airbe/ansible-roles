@@ -1,0 +1,85 @@
+---
+
+- name: "Create volumes for {{ container_name }}"
+  docker_volume:
+      name: "{{ volume.name }}"
+      state: "{{ volume.state }}"
+  when: volume.state == "present"
+  loop: "{{ container_volumes }}"
+  loop_control:
+      loop_var: "volume"
+
+- name: "Create directories for {{ container_name }}"
+  file:
+      path: "{{ dir.path }}"
+      state: "directory"
+      owner: "{{ dir.owner }}"
+      group: "{{ dir.group }}"
+      mode: "{{ dir.mode|default('755') }}"
+  loop: "{{ container_directories }}"
+  loop_control:
+      loop_var: "dir"
+
+- name: "Create files from template for {{ container_name }}"
+  template:
+    src: "{{ template.src }}"
+    dest: "{{ template.dest }}"
+    owner: "{{ template.owner }}"
+    group: "{{ template.group }}"
+    mode: "{{ template.mode }}"
+  loop: "{{ container_templates }}"
+  loop_control:
+      loop_var: "template"
+  register: templates
+
+- name: "Create networks for {{ container_name }}"
+  docker_network:
+      name: "{{ network.name }}"
+      state: "present"
+  loop: "{{ container_networks }}"
+  loop_control:
+      loop_var: "network"
+
+- name: "Deploy container {{ container_name }} from image {{ container_image }}"
+  docker_container:
+      name: "{{ container_name }}"
+      domainname: "{{ container_domain_name }}"
+      hostname: "{{ container_hostname }}"
+      image: "{{ container_image }}"
+      command: "{{ container_command }}"
+      state: "{{ container_state }}"
+      restart: "{{ templates.changed }}"
+      restart_policy: "{{ container_restart_policy }}"
+      ports: "{{ container_ports }}"
+      exposed_ports: "{{ container_exposed_ports }}"
+      volumes: "{{ container_mounts }}"
+      env: "{{ container_env }}"
+      networks: "{{ container_networks }}"
+      network_mode: "{{ container_network_mode|default('bridge') }}"
+      labels: "{{ container_labels }}"
+      pull: "{{ container_pull }}"
+      capabilities: "{{ container_capabilities }}"
+      devices: "{{ container_devices }}"
+      dns_servers: "{{ container_dns_servers }}"
+      privileged: "{{ container_privileged }}"
+      log_driver: "{{ container_log_driver }}"
+      log_options: "{{ container_log_options }}"
+      user: "{{ container_user }}"
+      cpu_shares: "{{ container_cpu_shares }}"
+      memory: "{{ container_memory }}"
+      memory_swap: "{{ container_memory_swap }}"
+      networks_cli_compatible: yes
+      purge_networks: yes
+      healthcheck: "{{ container_healthcheck }}"
+  register: deploy_container
+
+- name: "Delete volumes for {{ container_name }}"
+  docker_volume:
+      name: "{{ volume.name }}"
+      state: "{{ volume.state }}"
+  when:
+      - volume.state == "absent"
+      - container_state == "absent"
+  loop: "{{ container_volumes }}"
+  loop_control:
+      loop_var: "volume"

@@ -1,0 +1,35 @@
+---
+- name: "Create {{ k3s_group }} group"
+  group:
+    name: "{{ k3s_group }}"
+    state: present
+  when: k3s_group != "root"
+
+- name: "Create {{ k3s_user }} group"
+  user:
+    name: "{{ k3s_user }}"
+    create_home: no
+    shell: /usr/sbin/nologin
+    group: "{{ k3s_group }}"
+    groups: "{{ k3s_extra_groups }}"
+  when: k3s_user != "root"
+
+- name: Create k3s directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ k3s_user }}"
+    group: "{{ k3s_group }}"
+  loop:
+    - "{{ k3s_base_directory }}"
+    - "{{ k3s_directory }}"
+
+- name: "Get {{ k3s_release_url }}"
+  get_url:
+    url: "{{ k3s_release_url }}"
+    dest: "{{ k3s_binary_path }}"
+    owner: "{{ k3s_user }}"
+    group: "{{ k3s_group }}"
+    mode: +x
+
+- include: "{{ role }}.yml"

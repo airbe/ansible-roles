@@ -1,0 +1,17 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Prometheus Node Exporter
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/bin/node_exporter
+SyslogIdentifier=node-exporter
+Restart=always
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

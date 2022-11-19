@@ -1,0 +1,13 @@
+---
+
+crontabs: {}
+#crontabs: {}
+#  -
+#    month: "*"
+#    weekday: "*"
+#    day: "*"
+#    hour: "*"
+#    minute: "*"
+#    user: "root"
+#    state: "present"
+#    job: "find /home/pi/records/ -name \"*.mp4\" -mtime +14 -delete"

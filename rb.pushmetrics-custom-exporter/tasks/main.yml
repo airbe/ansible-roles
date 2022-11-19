@@ -1,0 +1,25 @@
+---
+
+- name: "create metrics-{{ pushgateway_custom_job_name }}.sh"
+  template:
+      src: "metrics.sh.j2"
+      dest: "/usr/bin/metrics-{{ pushgateway_custom_job_name }}.sh"
+      owner: "root"
+      group: "root"
+      mode: +x
+
+- name: "create systemd service (metrics-{{ pushgateway_custom_job_name }})"
+  template:
+      src: "metrics.service.j2"
+      dest: "/etc/systemd/system/metrics-{{ pushgateway_custom_job_name }}.service"
+      owner: "root"
+      group: "root"
+  notify: "pushmetrics-custom-restart-timer"
+
+- name: "create systemd timer (metrics-{{ pushgateway_custom_job_name }})"
+  template:
+      src: "metrics.timer.j2"
+      dest: "/etc/systemd/system/metrics-{{ pushgateway_custom_job_name }}.timer"
+      owner: "root"
+      group: "root"
+  notify: "pushmetrics-custom-restart-service"

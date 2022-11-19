@@ -1,0 +1,7 @@
+---
+
+- name: "restart-app"
+  systemd:
+    state: "restarted"
+    daemon_reload: yes
+    name: "{{ app_name }}"

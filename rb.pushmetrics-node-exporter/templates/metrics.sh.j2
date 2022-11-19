@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+main() {
+      curl -q -sS -o - "http://localhost:9100/metrics" | curl -q -sS -X POST "{{ pushgateway_url }}" --data-binary @-
+}
+
+main

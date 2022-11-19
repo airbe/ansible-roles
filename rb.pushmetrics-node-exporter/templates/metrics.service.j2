@@ -1,0 +1,9 @@
+[Unit]
+Description=send metrics every minute
+Wants=metrics.timer
+
+[Service]
+ExecStart=/usr/bin/metrics.sh
+
+[Install]
+WantedBy=metrics.target

@@ -1,0 +1,9 @@
+[Unit]
+Description=Update authorized_keys each 5 minutes
+
+[Timer]
+OnCalendar=*:0/5
+OnBootSec=120
+
+[Install]
+WantedBy=timers.target

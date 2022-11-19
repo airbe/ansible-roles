@@ -1,0 +1,88 @@
+---
+- hosts: myhostname
+  become: yes
+  roles:
+    - role: rb.container-deploy
+      container_networks:
+        - name: "traefik"
+        - name: "fibr"
+      container_directories:
+        - path: "/opt/containers-data/fibr/data"
+          owner: "rb"
+          group: "rb"
+      container_mounts:
+        - "/opt/containers-data/fibr/data:/data"
+      container_name: "fibr"
+      container_image: "vibioh/fibr:latest"
+      container_state: "started"
+      container_restart_policy: "always"
+      container_user: "1001:1001"
+      container_labels:
+        container_name: "fibr"
+        traefik.enable: "true"
+        traefik.frontend.passHostHeader: "true"
+        traefik.frontend.rule: "Host: myhostname"
+        traefik.protocol: "http"
+        traefik.port: "1080"
+        traefik.docker.network: "traefik"
+      container_env:
+        FIBR_AUTH_USERS: "1:rb:THISISASECRET"
+        FIBR_AUTH_PROFILES: 1:admin
+        FIBR_EXIF_DIRECT_ACCESS: "true"
+        FIBR_EXIF_URL: "http://exas:1080"
+        FIBR_IGNORE_PATTERN: ".st(folder|ignore)"
+        FIBR_LOGGER_JSON: "true"
+        FIBR_SANITIZE_ON_START: "true"
+        FIBR_THUMBNAIL_DIRECT_ACCESS: "true"
+        FIBR_THUMBNAIL_MIN_BITRATE: "30000000"
+        FIBR_THUMBNAIL_URL: "http://vith:1080"
+        FIBR_WEBHOOK_ENABLED: "true"
+        FIBR_PUBLIC_URL: "https://myhostname"
+        FIBR_STORAGE_DIRECTORY: "/data"
+      container_pull: yes
+    - role: rb.container-deploy
+      container_networks:
+        - name: "fibr"
+      container_name: "imaginary"
+      container_image: "h2non/imaginary:latest"
+      container_state: "started"
+      container_restart_policy: "always"
+      container_user: "1001:1001"
+      container_labels:
+        container_name: "imaginary"
+        traefik.enable: "false"
+      container_pull: yes
+    - role: rb.container-deploy
+      container_networks:
+        - name: "fibr"
+      container_name: "vith"
+      container_image: "vibioh/vith:latest"
+      container_state: "started"
+      container_restart_policy: "always"
+      container_labels:
+        container_name: "vith"
+        traefik.enable: "false"
+      container_pull: yes
+      container_mounts:
+        - "/opt/containers-data/fibr/data:/data"
+      container_env:
+        VITH_STORAGE_DIRECTORY: "/data"
+      container_ports:
+        - "1080:1080"
+      container_user: "1001:1001"
+    - role: rb.container-deploy
+      container_networks:
+        - name: "fibr"
+      container_name: "exas"
+      container_image: "vibioh/exas:latest"
+      container_state: "started"
+      container_restart_policy: "always"
+      container_labels:
+        container_name: "exas"
+        traefik.enable: "false"
+      container_pull: yes
+      container_mounts:
+        - "/opt/containers-data/fibr/data:/data"
+      container_env:
+        EXAS_STORAGE_DIRECTORY: "/data"
+      container_user: "1001:1001"

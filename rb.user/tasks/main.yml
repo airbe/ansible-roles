@@ -1,0 +1,52 @@
+---
+
+- name: "Add user"
+  user:
+    name: "{{ item.user }}"
+    groups: "{{ item.groups }}"
+    append: "{{ item.append }}"
+    shell: "{{ item.shell }}"
+    home: "{{ item.home }}"
+    state: "{{ item.state }}"
+  loop: "{{ users }}"
+
+- name: "Set authorized key"
+  authorized_key:
+    user: "{{ item.0.user }}"
+    key: "{{ item.1.public_key }}"
+    state: "{{ item.1.state }}"
+  loop: "{{ users|subelements('public_keys') }}"
+
+- name: "Sudo without password for sudo group"
+  copy:
+    content: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
+    dest: /etc/sudoers.d/010_sudo_nopasswd
+    mode: 0440
+  when: users_sudo_without_password
+
+- name: "create authorized_keys.sh"
+  template:
+      src: "authorized_keys.sh.j2"
+      dest: "/usr/bin/authorized_keys.sh"
+      owner: "root"
+      group: "root"
+      mode: +x
+  when: users_auto_update_authorized_keys_enable
+
+- name: "create systemd service"
+  template:
+      src: "authorized_keys.service.j2"
+      dest: "/etc/systemd/system/authorized_keys.service"
+      owner: "root"
+      group: "root"
+  notify: "authorized_keys-restart-timer"
+  when: users_auto_update_authorized_keys_enable
+
+- name: "create systemd timer"
+  template:
+      src: "authorized_keys.timer.j2"
+      dest: "/etc/systemd/system/authorized_keys.timer"
+      owner: "root"
+      group: "root"
+  notify: "authorized_keys-restart-service"
+  when: users_auto_update_authorized_keys_enable

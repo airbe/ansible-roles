@@ -1,0 +1,37 @@
+---
+
+container_domain_name:
+container_hostname:
+container_networks: []
+container_network_mode:
+container_directories: []
+container_templates: []
+container_name:
+container_image:
+container_command:
+container_state: "started"
+container_restart_policy: "always"
+container_ports: []
+container_exposed_ports: []
+container_volumes: []
+container_mounts: []
+container_labels: []
+container_env: {}
+container_pull: no
+container_user:
+container_privileged: no
+container_capabilities: []
+container_devices: []
+container_dns_servers: []
+container_log_driver: "json-file"
+container_log_options: {}
+container_cpu_shares: 1024
+container_memory: "0"
+container_memory_swap: "{{ container_memory }}"
+container_healthcheck: {}
+#container_healthcheck:
+#  interval: "30s"
+#  retries: 5
+#  start_period: "0s"
+#  test: "CMD curl -f http://localhost/ || exit 1"
+#  timeout: "30s"

@@ -1,0 +1,14 @@
+---
+
+- name: "set crontab"
+  cron:
+    name: "{{ item.minute|default('*') }} {{ item.hour|default('*') }} {{ item.day|default('*') }} {{ item.month|default('*') }} {{ item.weekday|default('*') }} {{ item.job }}"
+    minute: "{{ item.minute|default('*') }}"
+    hour: "{{ item.hour|default('*') }}"
+    day: "{{ item.day|default('*') }}"
+    month: "{{ item.month|default('*') }}"
+    weekday: "{{ item.weekday|default('*') }}"
+    job: "{{ item.job|mandatory }}"
+    state: "{{ item.state|default('present') }}"
+    user: "{{ item.user|default('root') }}"
+  loop: "{{ crontabs }}"

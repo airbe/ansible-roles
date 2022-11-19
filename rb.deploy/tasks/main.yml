@@ -1,0 +1,119 @@
+---
+- name: "create application group"
+  group:
+    name: "{{ app_group }}"
+    state: "present"
+
+- name: "create application user"
+  user:
+    name: "{{ app_user }}"
+    group: "{{ app_group }}"
+    createhome: no
+    state: "present"
+
+- name: "create releases directory"
+  file:
+    path: "{{ app_basedir }}/{{ app_name }}/releases"
+    state: "directory"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+
+- stat:
+    path: "{{ app_basedir }}/{{ app_name }}/releases/{{ app_name }}-{{ app_version }}"
+  register: app
+
+- name: "get {{ app_archive_url }}"
+  get_url:
+    url: "{{ app_archive_url }}"
+    dest: "/tmp/{{ app_name }}-{{ app_version }}.tar.gz"
+    username: "{{ app_archive_url_username }}"
+    password: '{{ app_archive_url_password }}'
+
+- name: "create {{ app_basedir }}/{{ app_name }}/releases/{{ app_name }}-{{ app_version }} directory"
+  file:
+    path: "{{ app_basedir }}/{{ app_name }}/releases/{{ app_name }}-{{ app_version }}"
+    state: "directory"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+
+- name: "unarchive application to {{ app_basedir }}/{{ app_name }}/releases/{{ app_name }}-{{ app_version }}"
+  unarchive:
+    copy: no
+    src: "/tmp/{{ app_name }}-{{ app_version }}.tar.gz"
+    dest: "{{ app_basedir }}/{{ app_name }}/releases/{{ app_name }}-{{ app_version }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+  when: app.stat.exists == false
+
+- name: "initialize the deploy root and gather facts"
+  become: yes
+  become_user: "{{ app_user }}"
+  deploy_helper:
+    path: "{{ app_basedir }}/{{ app_name }}"
+    shared_path: ""
+
+- name: "set release to {{ app_name }}-{{ app_version }}"
+  become: yes
+  become_user: "{{ app_user }}"
+  deploy_helper:
+    path: "{{ app_basedir }}/{{ app_name }}"
+    release: "{{ app_name }}-{{ app_version }}"
+    state: present
+    shared_path: ""
+
+- name: "create folder"
+  become: yes
+  become_user: "{{ app_user }}"
+  file:
+    path: "{{ deploy_helper.new_release_path }}/{{ item }}"
+    state: directory
+  with_items: "{{ app_custom_folders }}"
+
+- name: "create symlink"
+  become: yes
+  become_user: "{{ app_user }}"
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ deploy_helper.new_release_path }}/{{ item.dest }}"
+    state: "link"
+  with_items: "{{ app_custom_symlinks }}"
+
+- name: "add an unfinished file, to allow cleanup on successful finalize"
+  become: yes
+  become_user: "{{ app_user }}"
+  file:
+    path: "{{ deploy_helper.new_release_path }}/{{ deploy_helper.unfinished_filename }}"
+    state: touch
+  when: app.stat.exists == false
+
+- name: "create service"
+  template:
+    src: "service.j2"
+    dest: "/etc/systemd/system/{{ app_name }}.service"
+  notify:
+    - "restart-app"
+
+- name: "finalize deployment, current symlink + clean older release"
+  become: yes
+  become_user: "{{ app_user }}"
+  deploy_helper:
+    path: "{{ app_basedir }}/{{ app_name }}"
+    release: "{{ deploy_helper.new_release }}"
+    state: finalize
+    keep_releases: 3
+  register: version_deployed
+  notify:
+    - "restart-app"
+
+- name: "make sure service is started and enabled"
+  systemd:
+    daemon_reload: yes
+    state: "started"
+    name: "{{ app_name }}"
+    enabled: yes
+
+- name: "restart service"
+  systemd:
+    state: "restarted"
+    name: "{{ app_name }}"
+  when: version_deployed.changed

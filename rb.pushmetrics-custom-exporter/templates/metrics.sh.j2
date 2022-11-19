@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+main() {
+      curl -q -sS -o - "{{ pushgateway_custom_exporter_url }}" | curl -q -sS -X POST "{{ pushgateway_custom_url }}" --data-binary @-
+}
+
+main

@@ -1,0 +1,13 @@
+- name: "authorized_keys-restart-timer"
+  systemd:
+      daemon_reload: yes
+      enabled: yes
+      name: authorized_keys.timer
+      state: restarted
+
+- name: "authorized_keys-restart-service"
+  systemd:
+      daemon_reload: yes
+      enabled: yes
+      name: authorized_keys.service
+      state: restarted

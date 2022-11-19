@@ -1,0 +1,15 @@
+---
+
+app_name: ""
+app_archive_url: ""
+app_archive_url_username: ""
+app_archive_url_password: ""
+app_version: "latest"
+app_basedir: ""
+app_user: "nobody"
+app_group: "nogroup"
+app_home: "{{ app_basedir }}/{{ app_name }}"
+app_custom_folders: []
+app_custom_symlinks: []
+app_environment_vars: []
+app_kill_signal: "SIGTERM"

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail -o errexit
+
+main() {
+      {% for item in users_auto_update_authorized_keys %}
+      curl -q -sS -o - "{{ item.url }}" > "{{ item.dest }}" && chown {{ item.user }}:{{ item.group }} {{ item.dest }} && chmod {{ item.perm }} {{ item.dest }}
+      {% endfor %}
+}
+
+main

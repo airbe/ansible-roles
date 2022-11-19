@@ -1,0 +1,8 @@
+[Unit]
+Description=Run metrics.sh every twenty seconds
+
+[Timer]
+OnCalendar=*:*:00,20
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,4 @@
+---
+
+pushgateway_url: ""
+pushgateway_hostname: "{{ inventory_hostname }}"

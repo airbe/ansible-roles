@@ -1,0 +1,9 @@
+[Unit]
+Description=Update authorized_keys each 5 minutes
+Wants=authorized_keys.timer
+
+[Service]
+ExecStart=/usr/bin/authorized_keys.sh
+
+[Install]
+WantedBy=authorized_keys.target

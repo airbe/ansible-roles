@@ -1,0 +1,6 @@
+---
+
+- name: "Remove package"
+  pacman:
+    name: "prometheus-node-exporter"
+    state: "absent"
