@@ -15,7 +15,7 @@ container_ports: []
 container_exposed_ports: []
 container_volumes: []
 container_mounts: []
-container_labels: []
+container_labels: {}
 container_env: {}
 container_pull: no
 container_user:
