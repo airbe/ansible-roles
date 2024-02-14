@@ -72,6 +72,7 @@
       purge_networks: yes
       healthcheck: "{{ container_healthcheck }}"
       container_default_behavior: "no_defaults"
+      sysctls: "{{ container_sysctls }}"
   register: deploy_container
 
 - name: "Delete volumes for {{ container_name }}"
