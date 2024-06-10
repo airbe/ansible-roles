@@ -1,0 +1,6 @@
+---
+
+- name: "Remove package"
+  apt:
+    name: "prometheus-node-exporter"
+    state: "absent"
