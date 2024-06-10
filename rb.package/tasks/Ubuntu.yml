@@ -1,0 +1,17 @@
+---
+
+- name: "Update cache and upgrade package(s)"
+  apt:
+    update_cache: "yes"
+    upgrade: "yes"
+  register: "upgrade"
+
+- name: "Install package(s)"
+  apt:
+    name: "{{ packages }}"
+    state: "present"
+
+- name: "Remove package(s)"
+  apt:
+    name: "{{ packages_toremove }}"
+    state: "absent"
