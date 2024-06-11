@@ -73,6 +73,7 @@
       healthcheck: "{{ container_healthcheck }}"
       container_default_behavior: "no_defaults"
       sysctls: "{{ container_sysctls }}"
+      shm_size: "{{ container_shm_size }}"
   register: deploy_container
 
 - name: "Delete volumes for {{ container_name }}"

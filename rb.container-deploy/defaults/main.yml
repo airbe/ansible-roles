@@ -30,6 +30,7 @@ container_memory: "0"
 container_memory_swap: "{{ container_memory }}"
 container_healthcheck: {}
 container_sysctls: {}
+container_shm_size: "64M"
 #container_healthcheck:
 #  interval: "30s"
 #  retries: 5
