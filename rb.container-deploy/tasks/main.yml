@@ -74,6 +74,7 @@
       container_default_behavior: "no_defaults"
       sysctls: "{{ container_sysctls }}"
       shm_size: "{{ container_shm_size }}"
+      groups: "{{ container_groups }}"
   register: deploy_container
 
 - name: "Delete volumes for {{ container_name }}"
