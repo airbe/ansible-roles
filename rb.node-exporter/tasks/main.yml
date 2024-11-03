@@ -1,11 +1,10 @@
 ---
-
 #- name: "Stop existing service if installed by package"
 #  systemd:
 #      name: "prometheus-node-exporter"
 #      state: "stopped"
 
-- include: "{{ ansible_distribution }}.yml"
+- include_tasks: "{{ ansible_distribution }}.yml"
 
 - name: "Download and extract {{ node_exporter_url }}"
   unarchive:
@@ -19,7 +18,7 @@
     dest: "/usr/bin/node_exporter"
     owner: "root"
     group: "root"
-    mode: '0755'
+    mode: "0755"
     remote_src: "yes"
   notify: "restart-node-exporter"
 
@@ -29,7 +28,7 @@
     dest: "/etc/systemd/system/node-exporter.service"
     owner: "root"
     group: "root"
-    mode: '0644'
+    mode: "0644"
   notify: "restart-node-exporter"
 
 - name: "Make sure node-exporter is running"

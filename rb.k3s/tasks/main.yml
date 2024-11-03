@@ -32,4 +32,4 @@
     group: "{{ k3s_group }}"
     mode: +x
 
-- include: "{{ role }}.yml"
+- include_tasks: "{{ role }}.yml"
