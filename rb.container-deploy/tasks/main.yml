@@ -69,7 +69,6 @@
       memory: "{{ container_memory }}"
       memory_swap: "{{ container_memory_swap }}"
       networks_cli_compatible: yes
-      purge_networks: yes
       healthcheck: "{{ container_healthcheck }}"
       container_default_behavior: "no_defaults"
       sysctls: "{{ container_sysctls }}"
