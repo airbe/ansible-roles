@@ -32,6 +32,9 @@ container_healthcheck: {}
 container_sysctls: {}
 container_shm_size: "64M"
 container_groups: []
+container_etc_hosts: {}
+#container_etc_hosts:
+#  "myserver": "127.0.0.1"
 #container_healthcheck:
 #  interval: "30s"
 #  retries: 5

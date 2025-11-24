@@ -74,6 +74,7 @@
       sysctls: "{{ container_sysctls }}"
       shm_size: "{{ container_shm_size }}"
       groups: "{{ container_groups }}"
+      etc_hosts: "{{ container_etc_hosts }}"
   register: deploy_container
 
 - name: "Delete volumes for {{ container_name }}"
