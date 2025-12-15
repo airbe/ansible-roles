@@ -1,5 +1,4 @@
 ---
-
 - name: "Add user"
   user:
     name: "{{ item.user }}"
@@ -19,34 +18,74 @@
 
 - name: "Sudo without password for sudo group"
   copy:
-    content: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
+    content: "%sudo ALL=(ALL:ALL) NOPASSWD:ALL"
     dest: /etc/sudoers.d/010_sudo_nopasswd
     mode: 0440
   when: users_sudo_without_password
 
 - name: "create authorized_keys.sh"
   template:
-      src: "authorized_keys.sh.j2"
-      dest: "/usr/bin/authorized_keys.sh"
-      owner: "root"
-      group: "root"
-      mode: +x
+    src: "authorized_keys.sh.j2"
+    dest: "/usr/bin/authorized_keys.sh"
+    owner: "root"
+    group: "root"
+    mode: +x
   when: users_auto_update_authorized_keys_enable
 
 - name: "create systemd service"
   template:
-      src: "authorized_keys.service.j2"
-      dest: "/etc/systemd/system/authorized_keys.service"
-      owner: "root"
-      group: "root"
+    src: "authorized_keys.service.j2"
+    dest: "/etc/systemd/system/authorized_keys.service"
+    owner: "root"
+    group: "root"
   notify: "authorized_keys-restart-timer"
   when: users_auto_update_authorized_keys_enable
 
 - name: "create systemd timer"
   template:
-      src: "authorized_keys.timer.j2"
-      dest: "/etc/systemd/system/authorized_keys.timer"
-      owner: "root"
-      group: "root"
+    src: "authorized_keys.timer.j2"
+    dest: "/etc/systemd/system/authorized_keys.timer"
+    owner: "root"
+    group: "root"
   notify: "authorized_keys-restart-service"
   when: users_auto_update_authorized_keys_enable
+
+- name: check if authorized_keys.timer exists
+  stat:
+    path: "/etc/systemd/system/authorized_keys.timer"
+  register: authorized_keys_timer
+
+- name: "authorized_keys-stop-timer"
+  systemd:
+    daemon_reload: yes
+    enabled: no
+    name: authorized_keys.timer
+    state: stopped
+  when:
+    - users_auto_update_authorized_keys_enable == false
+    - authorized_keys_timer.stat.exists
+
+- name: check if authorized_keys.service exists
+  stat:
+    path: "/etc/systemd/system/authorized_keys.service"
+  register: authorized_keys_service
+
+- name: "authorized_keys-stop-service"
+  systemd:
+    daemon_reload: yes
+    enabled: no
+    name: authorized_keys.service
+    state: stopped
+  when:
+    - users_auto_update_authorized_keys_enable == false
+    - authorized_keys_service.stat.exists
+
+- name: "authorized_keys cleanup"
+  file:
+    path: "{{ item }}"
+    state: "absent"
+  when: users_auto_update_authorized_keys_enable == false
+  loop:
+    - "/etc/systemd/system/authorized_keys.timer"
+    - "/etc/systemd/system/authorized_keys.service"
+    - "/usr/bin/authorized_keys.sh"
