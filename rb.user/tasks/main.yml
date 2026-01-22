@@ -1,8 +1,14 @@
 ---
+- name: "Add group"
+  group:
+    name: "{{ item.group }}"
+    state: present
+  loop: "{{ users }}"
+
 - name: "Add user"
   user:
     name: "{{ item.user }}"
-    groups: "{{ item.groups }}"
+    groups: "{{ item.additional_groups }}"
     append: "{{ item.append }}"
     shell: "{{ item.shell }}"
     home: "{{ item.home }}"
